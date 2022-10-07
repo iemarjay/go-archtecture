@@ -11,12 +11,20 @@ type Env struct {
 	DatabaseUrl  string `env:"DATABASE_URL"`
 	DatabaseName string `env:"DATABASE_NAME"`
 
-	TermiiKey string `env:"TERMII_KEY"`
-
 	PublicPathPrefix string `env:"PUBLIC_PATH_PREFIX" envDefault:"public"`
 	PublicRootDir    string `env:"PUBLIC_ROOT_DIR" envDefault:"resources/public"`
 	RedisUrl         string `env:"REDIS_URL" envDefault:"resources/public"`
 	RedisPassword    string `env:"REDIS_PASSWORD"`
+
+	MailgunDomain     string `env:"MAILGUN_DOMAIN"`
+	MailgunPrivateKey string `env:"MAILGUN_PRIVATE_KEY"`
+
+	SmsFrom         string `env:"SMS_FROM" envDefault:"architecture"`
+	TermiiUri       string `env:"TERMII_URI" envDefault:"https://api.ng.termii.com/api/sms/send"`
+	TermiiApiKey    string `env:"TERMII_API_KEY"`
+	InfobipUri      string `env:"INFOBIP_URI" envDefault:"https://89nv13.api.infobip.com/sms/1/text/query"`
+	InfobipUsername string `env:"INFOBIP_USERNAME"`
+	InfobipPassword string `env:"INFOBIP_PASSWORD"`
 }
 
 func NewEnv(path ...string) (*Env, error, error) {

@@ -19,36 +19,31 @@ type Env struct {
 	RedisPassword    string `env:"REDIS_PASSWORD"`
 }
 
-func NewEnv() (*Env, error) {
-	e := &Env{}
-	if err := eEnv.Parse(e); err != nil {
-		return nil, err
+func NewEnv(path ...string) (*Env, error, error) {
+	var fileEnvMap map[string]string
+	var err error
+	if len(path) > 0 {
+		fileEnvMap, err = godotenv.Read(path[0])
 	}
 
-	return e, nil
+	env, err2 := NewEnvFromMap(fileEnvMap)
+
+	return env, err, err2
 }
 
 func NewEnvFromMap(defaults map[string]string) (*Env, error) {
 	e := &Env{}
-	options := eEnv.Options{
-		Environment: defaults,
+	options := eEnv.Options{}
+
+	if len(defaults) > 0 {
+		options = eEnv.Options{
+			Environment: defaults,
+		}
 	}
+
 	if err := eEnv.Parse(e, options); err != nil {
 		return nil, err
 	}
 
 	return e, nil
-}
-
-func NewEnvFromFile(filePath string) (*Env, error) {
-	value, err := godotenv.Read(filePath)
-	if err != nil {
-		return nil, err
-	}
-	env, err := NewEnvFromMap(value)
-	if err != nil {
-		return nil, err
-	}
-
-	return env, err
 }

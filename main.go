@@ -4,15 +4,20 @@ import (
 	"archtecture/app"
 	"archtecture/app/env"
 	"fmt"
+	"github.com/gofiber/fiber/v2"
 )
 
 func main() {
-	e, err := env.NewEnv()
-	if err != nil {
-		fmt.Printf("%+v\n", err)
+	e, fileErr, osErr := env.NewEnv(".env")
+	if fileErr != nil {
+		fmt.Printf("%+v\n", fileErr)
+	}
+	if osErr != nil {
+		fmt.Printf("%+v\n", osErr)
 	}
 
-	a := app.NewApp(e)
+	f := fiber.New()
+	a := app.NewApp(e, f)
 
 	a.StartFiber()
 }

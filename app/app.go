@@ -14,8 +14,8 @@ type App struct {
 	fibre *fiber.App
 }
 
-func NewApp(env *env.Env) *App {
-	return &App{env: env}
+func NewApp(env *env.Env, fibre *fiber.App) *App {
+	return &App{env: env, fibre: fibre}
 }
 
 func (a *App) Env() *env.Env {
@@ -32,7 +32,6 @@ func (a *App) Cache() *cache.Cache {
 }
 
 func (a *App) StartFiber() {
-	a.fibre = fiber.New()
 	a.fibre.Static(a.env.PublicPathPrefix, a.env.PublicRootDir)
 	a.fibre.Use(cors.New())
 

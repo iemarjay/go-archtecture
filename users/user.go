@@ -3,7 +3,9 @@ package users
 import (
 	"archtecture/app"
 	appHttp "archtecture/app/http"
+	"archtecture/users/logic"
 	"archtecture/users/ports/http"
+	"archtecture/users/repository"
 )
 
 type UserModule struct {
@@ -18,7 +20,18 @@ func NewUserModule(a *app.App) *UserModule {
 
 func (u *UserModule) Register() {
 	cache := u.app.Cache()
-	http.NewAuthHandler(authLogic, cache).RegisterRoutes(u.app)
+	u.app.Fibre().Use(appHttp.MiddlewareAuthUser(u.makeMongoRepository(), cache))
 
-	u.app.Fibre().Use(appHttp.MiddlewareAuthUser(db, cache))
+	http.NewAuthHandler(u.makeAuthLogic(), cache).RegisterRoutes(u.app)
+}
+
+func (u *UserModule) makeAuthLogic() *logic.Auth {
+	return logic.NewAuth(u.makeMongoRepository())
+}
+
+func (u *UserModule) makeMongoRepository() *repository.Mongo {
+	database := u.app.Database()
+	database.Table(repository.TableName)
+
+	return repository.NewMongo(database)
 }

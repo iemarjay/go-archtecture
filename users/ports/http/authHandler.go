@@ -4,19 +4,12 @@ import (
 	"archtecture/app"
 	"archtecture/app/cache"
 	"archtecture/app/http"
+	"archtecture/users/logic"
 	"github.com/gofiber/fiber/v2"
 )
 
-type user interface {
-	Key() string
-}
-
 type authLogic interface {
-	AttemptLogin(interface{}) (user, error)
-}
-
-type loginRequest interface {
-	toLogicInput() interface{}
+	AttemptLogin(map[string]string) (*logic.UserData, error)
 }
 
 type AuthHandler struct {
@@ -30,15 +23,25 @@ func NewAuthHandler(authLogic authLogic, cache *cache.Cache) *AuthHandler {
 }
 
 func (h *AuthHandler) RegisterRoutes(a *app.App) {
-	a.Fibre().Post("login", h.login())
+	a.Fibre().Get("", func(ctx *fiber.Ctx) error {
+		return ctx.JSON("message")
+	})
+	a.Fibre().Post("/login", h.login())
+	a.Fibre().Post("/logout", h.logout(), http.MiddlewareAuthJwt())
 }
 
 func (h *AuthHandler) login() fiber.Handler {
 	return func(ctx *fiber.Ctx) error {
-		var input loginRequest
-		user, err := h.authLogic.AttemptLogin(input.toLogicInput())
-		if err != nil {
+		input := map[string]string{
+			"identifier": ctx.FormValue("identifier"),
+			"password":   ctx.FormValue("password"),
+		}
+
+		user, err := h.authLogic.AttemptLogin(input)
+		if err == logic.UserNotFound {
 			return ctx.SendStatus(fiber.StatusUnauthorized)
+		} else if err != nil {
+			return ctx.SendStatus(fiber.StatusInternalServerError)
 		}
 
 		var token string

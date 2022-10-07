@@ -3,6 +3,7 @@ package main
 import (
 	"archtecture/app"
 	"archtecture/app/env"
+	"archtecture/users"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,6 +19,7 @@ func main() {
 
 	f := fiber.New()
 	a := app.NewApp(e, f)
+	users.NewUserModule(a).Register()
 
 	a.StartFiber()
 }

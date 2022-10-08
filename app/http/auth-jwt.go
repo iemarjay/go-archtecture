@@ -25,6 +25,10 @@ func MiddlewareAuthUser(db db, cache *cache.Cache) fiber.Handler {
 	auth := NewAuth(db, cache)
 
 	return func(ctx *fiber.Ctx) error {
+		if token := ctx.Locals("jwtToken"); token == nil {
+			return ctx.Next()
+		}
+
 		user, err := auth.authUser(ctx)
 		if err != nil {
 			return ctx.SendStatus(fiber.StatusUnauthorized)

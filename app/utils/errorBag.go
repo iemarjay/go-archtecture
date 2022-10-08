@@ -9,7 +9,7 @@ func NewErrorBag(errors ...map[interface{}]error) *ErrorBag {
 		return &ErrorBag{errors: errors[0]}
 	}
 
-	return &ErrorBag{}
+	return &ErrorBag{errors: map[interface{}]error{}}
 }
 
 func (e *ErrorBag) Add(key interface{}, err error) {

@@ -8,19 +8,21 @@ import (
 	"time"
 )
 
-func NewMailgunFromEnv(env *env.Env) {
-	NewMailGun(NewMailgunOptions(env))
+func NewMailgunFromEnv(env *env.Env) *MailGun {
+	return NewMailGun(NewMailgunOptions(env))
 }
 
 type MailgunOptions struct {
 	Domain     string
 	PrivateKey string
+	MailFrom   string
 }
 
 func NewMailgunOptions(env *env.Env) *MailgunOptions {
 	return &MailgunOptions{
 		Domain:     env.MailgunDomain,
 		PrivateKey: env.MailgunPrivateKey,
+		MailFrom:   env.MailFrom,
 	}
 }
 
@@ -33,18 +35,22 @@ func NewMailGun(options *MailgunOptions) *MailGun {
 }
 
 func (mg *MailGun) Send(notifiable notification.Notifiable, message notification.Message) error {
-	messageData := message.(mailMessage).ToMail(notifiable)
-	user := notifiable.(mailNotifiable)
+	mailNotifiable := notifiable.(MailNotifiable)
+	messageData := message.(MailMessage).ToMail(mailNotifiable)
 
 	to := messageData.To
 	if to == "" {
-		to = user.RouteNotificationForMail()
+		to = mailNotifiable.RouteNotificationForMail()
+	}
+	from := mg.options.MailFrom
+	if messageData.From != "" {
+		from = messageData.From
 	}
 
 	client := mailgun.NewMailgun(mg.options.Domain, mg.options.PrivateKey)
-	clientMessage := client.NewMessage(messageData.From, messageData.Subject, messageData.Body, to)
+	clientMessage := client.NewMessage(from, messageData.Subject, messageData.Body, to)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer cancel()
 
 	_, _, err := client.Send(ctx, clientMessage)

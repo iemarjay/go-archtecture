@@ -9,22 +9,22 @@ type MailMessageData struct {
 	Body    string
 }
 
-type mailMessage interface {
+type MailMessage interface {
 	notification.Message
-	ToMail(notification.Notifiable) MailMessageData
+	ToMail(MailNotifiable) *MailMessageData
 }
 
-type mailNotifiable interface {
+type MailNotifiable interface {
 	notification.Notifiable
 	RouteNotificationForMail() string
 }
 
-type smsMessage interface {
+type SmsMessage interface {
 	notification.Message
-	ToSms(notification.Notifiable) string
+	ToSms(SmsNotifiable) string
 }
 
-type smsNotifiable interface {
+type SmsNotifiable interface {
 	notification.Notifiable
 	RouteNotificationForSms() string
 }

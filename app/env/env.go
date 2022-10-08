@@ -18,11 +18,12 @@ type Env struct {
 
 	MailgunDomain     string `env:"MAILGUN_DOMAIN"`
 	MailgunPrivateKey string `env:"MAILGUN_PRIVATE_KEY"`
+	MailFrom          string `env:"MailFrom" envDefault:"mail@example.com"`
 
 	SmsFrom         string `env:"SMS_FROM" envDefault:"architecture"`
 	TermiiUri       string `env:"TERMII_URI" envDefault:"https://api.ng.termii.com/api/sms/send"`
 	TermiiApiKey    string `env:"TERMII_API_KEY"`
-	InfobipUri      string `env:"INFOBIP_URI" envDefault:"https://89nv13.api.infobip.com/sms/1/text/query"`
+	InfobipUri      string `env:"INFOBIP_URI"`
 	InfobipUsername string `env:"INFOBIP_USERNAME"`
 	InfobipPassword string `env:"INFOBIP_PASSWORD"`
 }

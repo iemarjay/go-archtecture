@@ -41,7 +41,7 @@ func (n *DefaultNotifier) That(message Message) error {
 
 	errors := utils.NewErrorBag()
 	for _, channel := range channels {
-		err := channel.Send(nil, message)
+		err := channel.Send(n.notifiable, message)
 		errors.Add(channel, err)
 	}
 

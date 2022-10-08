@@ -5,17 +5,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type repository interface {
+type authRepository interface {
 	FindByUniqueFields(field string) (*UserData, error)
 }
 
 var UserNotFound = errors.New("user with credentials not found")
 
 type Auth struct {
-	repository repository
+	repository authRepository
 }
 
-func NewAuth(repository repository) *Auth {
+func NewAuth(repository authRepository) *Auth {
 	return &Auth{repository: repository}
 }
 

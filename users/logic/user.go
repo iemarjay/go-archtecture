@@ -89,8 +89,7 @@ func (u *User) Register(input *UserData) (*UserData, error) {
 		return nil, err
 	}
 
-	_ = u.notifier.Notify(user).
-		That(u.message)
+	go u.notifier.Notify(user).That(u.message)
 
 	return user, nil
 }

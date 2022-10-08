@@ -80,6 +80,22 @@ func (m *Mongo) Find(id string) (*logic.UserData, error) {
 	return user.toUserData(), nil
 }
 
+func (m *Mongo) FindByUniqueFields(field string) (*logic.UserData, error) {
+	user := &mongoData{}
+	objectID, _ := primitive.ObjectIDFromHex(field)
+	filter := bson.M{"$or": []bson.M{
+		{"id": objectID},
+		{"email": field},
+		{"phone": field},
+	}}
+	err := m.db.FindOne(filter).Decode(user)
+	if err != nil {
+		return nil, err
+	}
+
+	return user.toUserData(), nil
+}
+
 func (m *Mongo) EmailOrPhoneExists(email string, phone string) (bool, error) {
 	filter := bson.M{"$or": []bson.M{
 		{"email": email},

@@ -23,10 +23,9 @@ func NewUserModule(a *app.App) *UserModule {
 }
 
 func (u *UserModule) Register() {
-	cache := u.app.Cache()
-	u.app.Fibre().Use(appHttp.MiddlewareAuthUser(u.makeMongoRepository(), cache))
+	u.app.Fibre().Use(appHttp.MiddlewareAuthUser(u.makeMongoRepository(), u.app.Cache()))
 
-	http.NewAuthHandler(u.makeAuthLogic(), cache).RegisterRoutes(u.app)
+	http.NewAuthHandler(u.makeAuthLogic(), u.makeJwtAuth()).RegisterRoutes(u.app)
 	http.NewUserHandler(u.makeUserLogic()).RegisterRoutes(u.app)
 }
 
@@ -51,4 +50,8 @@ func (u *UserModule) makeMongoRepository() *repositories.Mongo {
 	database.Table(repositories.TableName)
 
 	return repositories.NewMongo(database)
+}
+
+func (u *UserModule) makeJwtAuth() *appHttp.Auth {
+	return appHttp.NewAuth(u.makeMongoRepository(), u.app.Cache())
 }

@@ -3,9 +3,13 @@ package users
 import (
 	"archtecture/app"
 	appHttp "archtecture/app/http"
+	"archtecture/app/notification"
+	"archtecture/app/notification/channels"
+	"archtecture/app/validation"
 	"archtecture/users/logic"
+	"archtecture/users/logic/messages"
 	"archtecture/users/ports/http"
-	"archtecture/users/repository"
+	"archtecture/users/repositories"
 )
 
 type UserModule struct {
@@ -23,15 +27,28 @@ func (u *UserModule) Register() {
 	u.app.Fibre().Use(appHttp.MiddlewareAuthUser(u.makeMongoRepository(), cache))
 
 	http.NewAuthHandler(u.makeAuthLogic(), cache).RegisterRoutes(u.app)
+	http.NewUserHandler(u.makeUserLogic()).RegisterRoutes(u.app)
 }
 
 func (u *UserModule) makeAuthLogic() *logic.Auth {
 	return logic.NewAuth(u.makeMongoRepository())
 }
 
-func (u *UserModule) makeMongoRepository() *repository.Mongo {
-	database := u.app.Database()
-	database.Table(repository.TableName)
+func (u *UserModule) makeUserLogic() *logic.User {
+	env := u.app.Env()
+	repository := u.makeMongoRepository()
+	validator := validation.NewValidator()
+	notifier := notification.NewDefaultNotifier()
+	sms := channels.NewSmsFromEnv(env)
+	email := channels.NewMailgunFromEnv(env)
+	message := messages.NewWelcome(sms, email)
 
-	return repository.NewMongo(database)
+	return logic.NewUser(repository, validator, notifier, message)
+}
+
+func (u *UserModule) makeMongoRepository() *repositories.Mongo {
+	database := u.app.Database()
+	database.Table(repositories.TableName)
+
+	return repositories.NewMongo(database)
 }

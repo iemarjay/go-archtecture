@@ -117,3 +117,7 @@ func (db *MongoDatabase) FindOne(filter interface{}) Decoder {
 func (db *MongoDatabase) Find(filter interface{}) (Cursor, error) {
 	return db.collection.Find(context.Background(), filter)
 }
+
+func (db *MongoDatabase) Count(filter interface{}) (int64, error) {
+	return db.collection.CountDocuments(context.Background(), filter)
+}

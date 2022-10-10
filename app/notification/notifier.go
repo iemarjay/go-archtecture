@@ -27,13 +27,12 @@ func NewDefaultNotifier() *DefaultNotifier {
 
 func NewDefaultNotifierWithNotifiable(notifiable Notifiable) *DefaultNotifier {
 	notifier := NewDefaultNotifier()
-	notifier.Notify(notifiable)
+	notifier.notifiable = notifiable
 	return notifier
 }
 
 func (n *DefaultNotifier) Notify(notifiable Notifiable) Notifier {
-	n.notifiable = notifiable
-	return n
+	return &DefaultNotifier{notifiable: notifiable}
 }
 
 func (n *DefaultNotifier) That(message Message) error {

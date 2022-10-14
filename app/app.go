@@ -4,6 +4,7 @@ import (
 	"archtecture/app/cache"
 	"archtecture/app/database"
 	"archtecture/app/env"
+	"archtecture/app/events"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"log"
@@ -11,15 +12,24 @@ import (
 
 type App struct {
 	env   *env.Env
+	event *events.Event
 	fiber *fiber.App
 }
 
-func NewApp(env *env.Env, fibre *fiber.App) *App {
-	return &App{env: env, fiber: fibre}
+func NewAppWithEvent(env *env.Env, fiber *fiber.App) *App {
+	return NewApp(env, fiber, events.NewEvent())
+}
+
+func NewApp(env *env.Env, fibre *fiber.App, event *events.Event) *App {
+	return &App{env: env, fiber: fibre, event: event}
 }
 
 func (a *App) Env() *env.Env {
 	return a.env
+}
+
+func (a *App) Event() *events.Event {
+	return a.event
 }
 
 func (a *App) Database() *database.MongoDatabase {

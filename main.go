@@ -18,7 +18,7 @@ func main() {
 	}
 
 	f := fiber.New()
-	a := app.NewApp(e, f)
+	a := app.NewAppWithEvent(e, f)
 	users.NewUserModule(a).Register()
 
 	a.StartFiber()

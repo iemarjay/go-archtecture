@@ -1,15 +1,24 @@
 package logic
 
 import (
+	events2 "archtecture/app/events"
 	"archtecture/app/hash"
 	"archtecture/app/notification"
 	"archtecture/app/validation"
-	"archtecture/users/logic/messages"
 )
 
 type userRepository interface {
 	StoreUser(*UserData) (*UserData, error)
-	EmailOrPhoneExists(email string, phone string) (bool, error)
+	EmailOrPhoneExists(string, string) (bool, error)
+}
+
+type notifier interface {
+	Notify(notification.Notifiable) notification.Notifier
+	That(notification.Message) error
+}
+
+type event interface {
+	Emit(events2.Name, ...interface{})
 }
 
 type UserData struct {
@@ -47,28 +56,20 @@ func (u *UserData) GetFirstname() string {
 	return u.Firstname
 }
 
-type notifier interface {
-	Notify(notification.Notifiable) notification.Notifier
-	That(notification.Message) error
-}
-
 type User struct {
 	repository userRepository
 	validator  validator
-	notifier   notifier
-	message    *messages.Welcome
+	event      event
 }
 
 func NewUser(
 	repository userRepository,
 	validator validator,
-	notifier notifier,
-	message *messages.Welcome) *User {
+	event event) *User {
 	return &User{
 		repository: repository,
 		validator:  validator,
-		notifier:   notifier,
-		message:    message,
+		event:      event,
 	}
 }
 
@@ -89,7 +90,7 @@ func (u *User) Register(input *UserData) (*UserData, error) {
 		return nil, err
 	}
 
-	go u.notifier.Notify(user).That(u.message)
+	u.event.Emit(UserRegisteredName, NewUserRegistered(user))
 
 	return user, nil
 }

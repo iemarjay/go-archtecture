@@ -6,8 +6,9 @@ import (
 	"archtecture/app/notification"
 	"archtecture/app/notification/channels"
 	"archtecture/app/validation"
+	"archtecture/users/listeners"
 	"archtecture/users/logic"
-	"archtecture/users/logic/messages"
+	"archtecture/users/messages"
 	"archtecture/users/ports/http"
 	"archtecture/users/repositories"
 )
@@ -23,10 +24,12 @@ func NewUserModule(a *app.App) *UserModule {
 }
 
 func (u *UserModule) Register() {
-	u.app.Fibre().Use(appHttp.MiddlewareAuthUser(u.makeMongoRepository(), u.app.Cache()))
+	u.app.Fiber().Use(appHttp.MiddlewareAuthUser(u.makeMongoRepository(), u.app.Cache()))
 
-	http.NewAuthHandler(u.makeAuthLogic(), u.makeJwtAuth()).RegisterRoutes(u.app)
+	http.NewAuthHandler(u.makeAuthLogic(), u.makeJwtAuth()).RegisterRoutes(u.app.Fiber())
 	http.NewUserHandler(u.makeUserLogic()).RegisterRoutes(u.app)
+
+	u.app.Event().Listen(logic.UserRegisteredName, u.makeSendWelcomeMessageListener())
 }
 
 func (u *UserModule) makeAuthLogic() *logic.Auth {
@@ -34,15 +37,24 @@ func (u *UserModule) makeAuthLogic() *logic.Auth {
 }
 
 func (u *UserModule) makeUserLogic() *logic.User {
-	env := u.app.Env()
 	repository := u.makeMongoRepository()
 	validator := validation.NewValidator()
+
+	return logic.NewUser(repository, validator, u.app.Event())
+}
+
+func (u *UserModule) makeSendWelcomeMessageListener() *listeners.SendWelcomeNotification {
 	notifier := notification.NewDefaultNotifier()
+	message := u.makeWelcomeMessage()
+
+	return listeners.NewSendWelcomeNotification(notifier, message)
+}
+
+func (u *UserModule) makeWelcomeMessage() *messages.Welcome {
+	env := u.app.Env()
 	sms := channels.NewSmsFromEnv(env)
 	email := channels.NewMailgunFromEnv(env)
-	message := messages.NewWelcome(sms, email)
-
-	return logic.NewUser(repository, validator, notifier, message)
+	return messages.NewWelcome(sms, email)
 }
 
 func (u *UserModule) makeMongoRepository() *repositories.Mongo {

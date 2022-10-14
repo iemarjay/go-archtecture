@@ -16,7 +16,7 @@ func NewUserHandler(logic *logic.User) *UserHandler {
 }
 
 func (h *UserHandler) RegisterRoutes(a *app.App) {
-	a.Fibre().Post("register", h.register())
+	a.Fiber().Post("register", h.register())
 }
 
 func (h *UserHandler) register() fiber.Handler {

@@ -6,7 +6,7 @@ import (
 )
 
 type authRepository interface {
-	FindByUniqueFields(field string) (*UserData, error)
+	FindByUniqueFields(string) (*UserData, error)
 }
 
 var UserNotFound = errors.New("user with credentials not found")
@@ -23,8 +23,7 @@ func (a *Auth) AttemptLogin(input map[string]string) (*UserData, error) {
 	user, err := a.repository.FindByUniqueFields(input["identifier"])
 	if err == mongo.ErrNoDocuments || user == nil {
 		return nil, UserNotFound
-	}
-	if err != nil {
+	} else if err != nil {
 		return nil, err
 	}
 

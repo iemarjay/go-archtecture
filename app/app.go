@@ -11,11 +11,11 @@ import (
 
 type App struct {
 	env   *env.Env
-	fibre *fiber.App
+	fiber *fiber.App
 }
 
 func NewApp(env *env.Env, fibre *fiber.App) *App {
-	return &App{env: env, fibre: fibre}
+	return &App{env: env, fiber: fibre}
 }
 
 func (a *App) Env() *env.Env {
@@ -32,12 +32,12 @@ func (a *App) Cache() *cache.Cache {
 }
 
 func (a *App) StartFiber() {
-	a.fibre.Static(a.env.PublicPathPrefix, a.env.PublicRootDir)
-	a.fibre.Use(cors.New())
+	a.fiber.Static(a.env.PublicPathPrefix, a.env.PublicRootDir)
+	a.fiber.Use(cors.New())
 
-	log.Fatal(a.fibre.Listen(":" + a.env.Port))
+	log.Fatal(a.fiber.Listen(":" + a.env.Port))
 }
 
-func (a *App) Fibre() *fiber.App {
-	return a.fibre
+func (a *App) Fiber() *fiber.App {
+	return a.fiber
 }

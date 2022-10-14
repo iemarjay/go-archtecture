@@ -27,7 +27,7 @@ func (a *App) Database() *database.MongoDatabase {
 	return database.NewMongoDatabaseFromConfig(config)
 }
 
-func (a *App) Cache() *cache.Cache {
+func (a *App) Cache() *cache.Redis {
 	return cache.NewCacheWithRedisFromConfig(cache.NewConfig(a.env))
 }
 

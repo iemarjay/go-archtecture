@@ -18,15 +18,15 @@ func NewConfig(env *env.Env) *Config {
 	}
 }
 
-type Cache struct {
-	redisClient *redis.Client
+type Redis struct {
+	client *redis.Client
 }
 
-func NewCacheWithRedis(rc *redis.Client) *Cache {
-	return &Cache{redisClient: rc}
+func NewCacheWithRedis(rc *redis.Client) *Redis {
+	return &Redis{client: rc}
 }
 
-func NewCacheWithRedisFromConfig(config *Config) *Cache {
+func NewCacheWithRedisFromConfig(config *Config) *Redis {
 	client := redis.NewClient(&redis.Options{
 		Addr:     config.RedisUrl,
 		Password: config.RedisPassword,
@@ -35,24 +35,24 @@ func NewCacheWithRedisFromConfig(config *Config) *Cache {
 	return NewCacheWithRedis(client)
 }
 
-func (c *Cache) Set(key string, value string, expiry time.Duration) error {
-	err := c.redisClient.Set(key, value, expiry).Err()
+func (c *Redis) Set(key string, value string, expiry time.Duration) error {
+	err := c.client.Set(key, value, expiry).Err()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (c *Cache) Get(key string) (string, error) {
-	value, err := c.redisClient.Get(key).Result()
+func (c *Redis) Get(key string) (string, error) {
+	value, err := c.client.Get(key).Result()
 	if err != nil {
 		return "", err
 	}
 	return value, nil
 }
 
-func (c *Cache) Forget(key string) error {
-	_, err := c.redisClient.Del(key).Result()
+func (c *Redis) Forget(key string) error {
+	_, err := c.client.Del(key).Result()
 	if err != nil {
 		return err
 	}
@@ -60,8 +60,8 @@ func (c *Cache) Forget(key string) error {
 	return nil
 }
 
-func (c *Cache) GetOrDefault(key string, fail string) string {
-	value, err := c.redisClient.Get(key).Result()
+func (c *Redis) GetOrDefault(key string, fail string) string {
+	value, err := c.client.Get(key).Result()
 	if err != nil {
 		return fail
 	}

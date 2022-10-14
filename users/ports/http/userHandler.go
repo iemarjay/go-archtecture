@@ -1,7 +1,6 @@
 package http
 
 import (
-	"archtecture/app"
 	"archtecture/app/validation"
 	"archtecture/users/logic"
 	"github.com/gofiber/fiber/v2"
@@ -15,8 +14,8 @@ func NewUserHandler(logic *logic.User) *UserHandler {
 	return &UserHandler{logic: logic}
 }
 
-func (h *UserHandler) RegisterRoutes(a *app.App) {
-	a.Fiber().Post("register", h.register())
+func (h *UserHandler) RegisterRoutes(f *fiber.App) {
+	f.Post("register", h.register())
 }
 
 func (h *UserHandler) register() fiber.Handler {

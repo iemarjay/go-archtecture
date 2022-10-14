@@ -1,7 +1,7 @@
 package integration
 
 import (
-	cache2 "archtecture/app/cache"
+	"archtecture/app/cache"
 	appHttp "archtecture/app/http"
 	"archtecture/users/logic"
 	"archtecture/users/ports/http"
@@ -42,6 +42,7 @@ func TestLogin_Successful(t *testing.T) {
 	u := data["user"].(map[string]interface{})
 	token, exists := data["token"]
 
+	assert.Equal(t, resp.StatusCode, fiber.StatusOK)
 	assert.Equal(t, true, exists)
 	assert.NotEqual(t, "", token)
 	assert.Equal(t, "auth@example.test", u["email"])
@@ -73,11 +74,11 @@ func TestLogin_ValidationFails(t *testing.T) {
 }
 
 func makeJwtAuth(repo *repositories.Map) *appHttp.Auth {
-	return appHttp.NewAuth(repo, cache())
+	return appHttp.NewAuth(repo, mapCache())
 }
 
-func cache() *cache2.Map {
-	return cache2.NewMap(map[string]*cache2.Data{})
+func mapCache() *cache.Map {
+	return cache.NewMap(map[string]*cache.Data{})
 }
 
 type httpTest struct {

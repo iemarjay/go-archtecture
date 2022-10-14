@@ -27,7 +27,7 @@ func (u *UserModule) Register() {
 	u.app.Fiber().Use(appHttp.MiddlewareAuthUser(u.makeMongoRepository(), u.app.Cache()))
 
 	http.NewAuthHandler(u.makeAuthLogic(), u.makeJwtAuth()).RegisterRoutes(u.app.Fiber())
-	http.NewUserHandler(u.makeUserLogic()).RegisterRoutes(u.app)
+	http.NewUserHandler(u.makeUserLogic()).RegisterRoutes(u.app.Fiber())
 
 	u.app.Event().Listen(logic.UserRegisteredName, u.makeSendWelcomeMessageListener())
 }

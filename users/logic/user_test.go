@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"archtecture/app/hash"
 	"archtecture/app/validation"
 	"errors"
 	"github.com/go-playground/assert/v2"
@@ -36,6 +37,7 @@ func TestUser_Register(t *testing.T) {
 
 	assert.Equal(t, user, result)
 	assert.Equal(t, err, nil)
+	assert.Equal(t, hash.Compare("password", result.Password), true)
 }
 
 func TestUser_CannotRegisterUserWhenValidationFails(t *testing.T) {

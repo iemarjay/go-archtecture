@@ -1,7 +1,6 @@
 package http
 
 import (
-	"archtecture/app/cache"
 	"archtecture/app/utils"
 	"archtecture/users/logic"
 	"github.com/gofiber/fiber/v2"
@@ -14,6 +13,12 @@ type db interface {
 	Find(id string) (*logic.UserData, error)
 }
 
+type cache interface {
+	Set(key string, value string, expiry time.Duration) error
+	Get(key string) (string, error)
+	Forget(key string) error
+}
+
 func MiddlewareAuthJwt() fiber.Handler {
 	return jwtWare.New(jwtWare.Config{
 		ContextKey: "jwtToken",
@@ -21,7 +26,7 @@ func MiddlewareAuthJwt() fiber.Handler {
 	})
 }
 
-func MiddlewareAuthUser(db db, cache *cache.Cache) fiber.Handler {
+func MiddlewareAuthUser(db db, cache cache) fiber.Handler {
 	auth := NewAuth(db, cache)
 
 	return func(ctx *fiber.Ctx) error {
@@ -42,10 +47,10 @@ func MiddlewareAuthUser(db db, cache *cache.Cache) fiber.Handler {
 
 type Auth struct {
 	db    db
-	cache *cache.Cache
+	cache cache
 }
 
-func NewAuth(db db, cache *cache.Cache) *Auth {
+func NewAuth(db db, cache cache) *Auth {
 	return &Auth{db: db, cache: cache}
 }
 

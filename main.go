@@ -19,6 +19,8 @@ func main() {
 
 	f := fiber.New()
 	a := app.NewAppWithEvent(e, f)
+
+	a.UseRedisCache()
 	users.NewUserModule(a).BootWithMongoAndFiber()
 
 	a.StartFiber()

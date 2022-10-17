@@ -14,6 +14,7 @@ type App struct {
 	env   *env.Env
 	event *events.Event
 	fiber *fiber.App
+	cache cache.Cache
 }
 
 func NewAppWithEvent(env *env.Env, fiber *fiber.App) *App {
@@ -35,6 +36,18 @@ func (a *App) Event() *events.Event {
 func (a *App) Database() *database.MongoDatabase {
 	config := database.NewMongoDatabaseConfigFromEnv(a.env)
 	return database.NewMongoDatabaseFromConfig(config)
+}
+
+func (a *App) UseRedisCache() *App {
+	a.SetCache(cache.NewCacheWithRedisFromConfig(cache.NewConfig(a.env)))
+
+	return a
+}
+
+func (a *App) SetCache(cache cache.Cache) *App {
+	a.cache = cache
+
+	return a
 }
 
 func (a *App) Cache() *cache.Redis {

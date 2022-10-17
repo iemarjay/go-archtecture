@@ -21,6 +21,7 @@ func NewUserModule(a *app.App) *UserModule {
 	}
 }
 
+func (u *UserModule) BootWithMongoAndFiber() {
 	u.app.Fiber().Use(appHttp.MiddlewareAuthUser(u.makeMongoRepository(), u.app.Cache()))
 
 	http.NewAuthHandler(u.makeAuthLogic(), u.makeJwtAuth()).RegisterRoutes(u.app.Fiber())

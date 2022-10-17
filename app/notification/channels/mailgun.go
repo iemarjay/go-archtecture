@@ -38,6 +38,10 @@ func (mg *MailGun) Send(notifiable notification.Notifiable, message notification
 	mailNotifiable := notifiable.(MailNotifiable)
 	messageData := message.(MailMessage).ToMail(mailNotifiable)
 
+	return mg.SendMail(mailNotifiable, messageData)
+}
+
+func (mg *MailGun) SendMail(mailNotifiable MailNotifiable, messageData *MailMessageData) error {
 	to := messageData.To
 	if to == "" {
 		to = mailNotifiable.RouteNotificationForMail()

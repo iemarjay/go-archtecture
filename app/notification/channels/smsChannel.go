@@ -43,6 +43,10 @@ func NewSmsChannel(options *SmsOptions) *SmsChannel {
 
 func (s *SmsChannel) Send(notifiable notification.Notifiable, message notification.Message) error {
 	smsNotifiable := notifiable.(SmsNotifiable)
+	return s.SendSms(message, smsNotifiable)
+}
+
+func (s *SmsChannel) SendSms(message notification.Message, smsNotifiable SmsNotifiable) error {
 	sms := message.(SmsMessage).ToSms(smsNotifiable)
 	to := smsNotifiable.RouteNotificationForSms()
 

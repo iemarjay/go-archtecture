@@ -1,9 +1,8 @@
 package logic
 
 import (
-	events2 "archtecture/app/events"
+	appEvent "archtecture/app/events"
 	"archtecture/app/hash"
-	"archtecture/app/notification"
 	"archtecture/app/validation"
 )
 
@@ -12,13 +11,8 @@ type userRepository interface {
 	EmailOrPhoneExists(string, string) (bool, error)
 }
 
-type notifier interface {
-	Notify(notification.Notifiable) notification.Notifier
-	That(notification.Message) error
-}
-
 type event interface {
-	Emit(events2.Name, ...interface{})
+	Emit(appEvent.Name, interface{})
 }
 
 type UserData struct {

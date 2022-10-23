@@ -27,7 +27,7 @@ func (u *UserModule) BootWithMongoAndFiber() {
 	http.NewAuthHandler(u.makeAuthLogic(), u.makeJwtAuth()).RegisterRoutes(u.app.Fiber())
 	http.NewUserHandler(u.makeUserLogic()).RegisterRoutes(u.app.Fiber())
 
-	u.app.Event().Listen(logic.UserRegisteredName, u.makeSendWelcomeMail())
+	u.app.Event().Listen(logic.UserRegisteredEvent, u.makeSendWelcomeMail())
 }
 
 func (u *UserModule) makeAuthLogic() *logic.Auth {

@@ -4,7 +4,7 @@ import (
 	"archtecture/app/events"
 )
 
-const UserRegisteredName events.Name = "UserRegistered"
+const UserRegisteredEvent events.Name = "UserRegistered"
 
 type UserRegistered struct {
 	user *UserData

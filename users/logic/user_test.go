@@ -28,7 +28,7 @@ func TestUser_Register(t *testing.T) {
 	repository.EXPECT().StoreUser(gomock.Any()).Return(result, nil).MinTimes(1)
 
 	event := NewMockevent(ctrl)
-	event.EXPECT().Emit(gomock.Eq(UserRegisteredName), gomock.Any()).MinTimes(1)
+	event.EXPECT().Emit(gomock.Eq(UserRegisteredEvent), gomock.Any()).MinTimes(1)
 
 	validator := validation.NewValidator()
 
@@ -57,7 +57,7 @@ func TestUser_CannotRegisterUserWhenValidationFails(t *testing.T) {
 	repository.EXPECT().StoreUser(gomock.Any()).Return(result, nil).Times(0)
 
 	event := NewMockevent(ctrl)
-	event.EXPECT().Emit(gomock.Eq(UserRegisteredName), gomock.Any()).Times(0)
+	event.EXPECT().Emit(gomock.Eq(UserRegisteredEvent), gomock.Any()).Times(0)
 
 	validator := validation.NewValidator()
 
@@ -87,7 +87,7 @@ func TestUser_CannotRegisterUserWhenEmailOrPhoneExits(t *testing.T) {
 	repository.EXPECT().StoreUser(gomock.Any()).Return(result, nil).Times(0)
 
 	event := NewMockevent(ctrl)
-	event.EXPECT().Emit(gomock.Eq(UserRegisteredName), gomock.Any()).Times(0)
+	event.EXPECT().Emit(gomock.Eq(UserRegisteredEvent), gomock.Any()).Times(0)
 
 	validator := validation.NewValidator()
 
@@ -118,7 +118,7 @@ func TestUser_CannotRegisterUserWhenRepositoryReturnsError(t *testing.T) {
 	repository.EXPECT().StoreUser(gomock.Any()).Return(result, err).MinTimes(1)
 
 	event := NewMockevent(ctrl)
-	event.EXPECT().Emit(gomock.Eq(UserRegisteredName), gomock.Any()).MinTimes(0)
+	event.EXPECT().Emit(gomock.Eq(UserRegisteredEvent), gomock.Any()).MinTimes(0)
 
 	validator := validation.NewValidator()
 

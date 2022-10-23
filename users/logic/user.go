@@ -84,7 +84,7 @@ func (u *User) Register(input *UserData) (*UserData, error) {
 		return nil, err
 	}
 
-	u.event.Emit(UserRegisteredName, NewUserRegistered(user))
+	u.event.Emit(UserRegisteredEvent, NewUserRegistered(user))
 
 	return user, nil
 }

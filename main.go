@@ -21,7 +21,7 @@ func main() {
 	a := app.NewAppWithEvent(e, f)
 
 	a.UseRedisCache()
-	users.NewUserModule(a).BootWithMongoAndFiber()
+	users.NewOrchestrator(a).BootWithMongoAndFiber()
 
 	a.StartFiber()
 }

@@ -11,17 +11,17 @@ import (
 	"archtecture/users/repositories"
 )
 
-type UserModule struct {
+type Orchestrator struct {
 	app *app.App
 }
 
-func NewUserModule(a *app.App) *UserModule {
-	return &UserModule{
+func NewOrchestrator(a *app.App) *Orchestrator {
+	return &Orchestrator{
 		app: a,
 	}
 }
 
-func (u *UserModule) BootWithMongoAndFiber() {
+func (u *Orchestrator) BootWithMongoAndFiber() {
 	u.app.Fiber().Use(appHttp.MiddlewareAuthUser(u.makeMongoRepository(), u.app.Cache()))
 
 	rest.NewAuthHandler(u.makeAuthLogic(), u.makeJwtAuth()).RegisterRoutes(u.app.Fiber())
@@ -30,29 +30,29 @@ func (u *UserModule) BootWithMongoAndFiber() {
 	u.app.Event().Listen(logic.UserRegisteredEvent, u.makeSendWelcomeMail())
 }
 
-func (u *UserModule) makeAuthLogic() *logic.Auth {
+func (u *Orchestrator) makeAuthLogic() *logic.Auth {
 	return logic.NewAuth(u.makeMongoRepository())
 }
 
-func (u *UserModule) makeUserLogic() *logic.User {
+func (u *Orchestrator) makeUserLogic() *logic.User {
 	repository := u.makeMongoRepository()
 	validator := validation.NewValidator()
 
 	return logic.NewUser(repository, validator, u.app.Event())
 }
 
-func (u *UserModule) makeMongoRepository() *repositories.Mongo {
+func (u *Orchestrator) makeMongoRepository() *repositories.Mongo {
 	database := u.app.Database()
 	database.Table(repositories.TableName)
 
 	return repositories.NewMongo(database)
 }
 
-func (u *UserModule) makeJwtAuth() *appHttp.Auth {
+func (u *Orchestrator) makeJwtAuth() *appHttp.Auth {
 	return appHttp.NewAuth(u.makeMongoRepository(), u.app.Cache())
 }
 
-func (u *UserModule) makeSendWelcomeMail() *listeners.SendWelcomeMail {
+func (u *Orchestrator) makeSendWelcomeMail() *listeners.SendWelcomeMail {
 	mg := channels.NewMailgunFromEnv(u.app.Env())
 	return listeners.NewSendWelcomeMail(mg)
 }

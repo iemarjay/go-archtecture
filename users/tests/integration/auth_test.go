@@ -4,7 +4,7 @@ import (
 	"archtecture/app/cache"
 	appHttp "archtecture/app/http"
 	"archtecture/users/logic"
-	"archtecture/users/ports/http"
+	"archtecture/users/ports/rest"
 	"archtecture/users/repositories"
 	"encoding/json"
 	"github.com/go-playground/assert/v2"
@@ -27,7 +27,7 @@ func TestLogin_Successful(t *testing.T) {
 	}
 	_ = user.EncryptPassword()
 	repository := repositories.NewMap(user)
-	http.NewAuthHandler(logic.NewAuth(repository), makeJwtAuth(repository)).
+	rest.NewAuthHandler(logic.NewAuth(repository), makeJwtAuth(repository)).
 		RegisterRoutes(f)
 
 	input := `{"identifier": "auth@example.test", "password": "secret"}`
@@ -62,7 +62,7 @@ func TestLogin_ValidationFails(t *testing.T) {
 	_ = user.EncryptPassword()
 
 	repository := repositories.NewMap(user)
-	http.NewAuthHandler(logic.NewAuth(repository), makeJwtAuth(repository)).
+	rest.NewAuthHandler(logic.NewAuth(repository), makeJwtAuth(repository)).
 		RegisterRoutes(f)
 
 	input := `{"identifier": "auth@example.test", "password": "secret3234"}`

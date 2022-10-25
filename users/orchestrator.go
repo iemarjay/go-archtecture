@@ -7,7 +7,7 @@ import (
 	"archtecture/app/validation"
 	"archtecture/users/listeners"
 	"archtecture/users/logic"
-	"archtecture/users/ports/http"
+	"archtecture/users/ports/rest"
 	"archtecture/users/repositories"
 )
 
@@ -24,8 +24,8 @@ func NewUserModule(a *app.App) *UserModule {
 func (u *UserModule) BootWithMongoAndFiber() {
 	u.app.Fiber().Use(appHttp.MiddlewareAuthUser(u.makeMongoRepository(), u.app.Cache()))
 
-	http.NewAuthHandler(u.makeAuthLogic(), u.makeJwtAuth()).RegisterRoutes(u.app.Fiber())
-	http.NewUserHandler(u.makeUserLogic()).RegisterRoutes(u.app.Fiber())
+	rest.NewAuthHandler(u.makeAuthLogic(), u.makeJwtAuth()).RegisterRoutes(u.app.Fiber())
+	rest.NewUserHandler(u.makeUserLogic()).RegisterRoutes(u.app.Fiber())
 
 	u.app.Event().Listen(logic.UserRegisteredEvent, u.makeSendWelcomeMail())
 }

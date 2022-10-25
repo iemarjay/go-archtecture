@@ -4,7 +4,7 @@ import (
 	"archtecture/app/events"
 	"archtecture/app/validation"
 	"archtecture/users/logic"
-	"archtecture/users/ports/http"
+	"archtecture/users/ports/rest"
 	"archtecture/users/repositories"
 	"encoding/json"
 	"github.com/go-playground/assert/v2"
@@ -27,7 +27,7 @@ func TestRegisterEndpoint_IsOk(t *testing.T) {
 	_ = user.EncryptPassword()
 
 	repository := repositories.NewMap()
-	http.NewUserHandler(logic.NewUser(repository, validation.NewValidator(), events.NewEvent())).
+	rest.NewUserHandler(logic.NewUser(repository, validation.NewValidator(), events.NewEvent())).
 		RegisterRoutes(f)
 
 	input := `{"email": "auth@example.test", "phone": "+2349083874378", "password": "secret", "firstname": "Dream", "lastname": "Paul"}`
@@ -50,7 +50,7 @@ func TestRegisterEndpoint_ShouldRespondWithUnprocessableEntity(t *testing.T) {
 	f := fiber.New()
 
 	repository := repositories.NewMap()
-	http.NewUserHandler(logic.NewUser(repository, validation.NewValidator(), events.NewEvent())).
+	rest.NewUserHandler(logic.NewUser(repository, validation.NewValidator(), events.NewEvent())).
 		RegisterRoutes(f)
 
 	input := `{"password": "secret", "firstname": "Dream", "lastname": "Paul"}`
